@@ -1,0 +1,72 @@
+def play_game():
+    max_word_length = 7
+    word_length = 3
+    correct_guesses = []
+    guessesLeft = 5
+    letter_boost_available = False
+    mulligan_available = False
+    game = True
+    while game:
+        randword = select_random_word(word_length)
+        boost_type = generate_boost()  # Generate boost type for each word
+        print("Guess the", word_length, "letter word.")
+        for _ in range(guessesLeft):
+            guess = input("Enter your guess or activate your boost/mulligan! (type '1' for letter boost, '2' for mulligan) ")
+            if guess == "1":
+                if letter_boost_available:
+                    reveal_index = apply_boost(boost_type, randword)
+                    if reveal_index is not None:
+                        print("Revealed letter at index", reveal_index + 1, ":", randword[reveal_index])
+                        letter_boost_available = False
+                        guessesLeft += 1
+            elif guess == "2":
+                if mulligan_available:
+                    randword = mulligan(randword, word_length)
+                    guessesLeft = 4  # Reset guesses after mulligan
+                    mulligan_available = False
+            elif guess == randword:
+                if word_length == max_word_length:
+                    print("Congratulations! You guessed a", max_word_length, "letter word! Well done!")
+                    correct_guesses.append(randword)
+                    play_again = input("Do you want to play again? (yes/no): ")
+                    if play_again.lower() != 'yes':
+                        return
+                    else:
+                        word_length = 3  # Reset to 3-letter words
+                        letter_boost_available = True  # Allow letter boost for the new word length
+                        mulligan_available = True  # Allow mulligan for the new word length
+                        break
+                else:
+                    print("Congratulations! You guessed the word correctly (and gained a boost!). The word was:", randword)
+                    correct_guesses.append(randword)
+                    if generate_boost() == "reveal_letter":
+                        print("You got a letter boost!")
+                        letter_boost_available = True 
+                    elif generate_boost() == "mulligan":
+                        print("You got a mulligan boost!")
+                        mulligan_available = True 
+                    guessesLeft = 4  # Refresh guesses for the next word
+                    word_length += 1  # Move to the next word length
+                    if word_length == 7:
+                        word_length = 3
+                    break
+            else:
+                print("Incorrect guess. Try again.")
+                incorrect = ''
+                for letter in guess:
+                    if letter in randword:
+                        if letter == randword[guess.index(letter)]:
+                            incorrect += letter
+                        else:
+                            incorrect += '~'
+                    else:
+                        incorrect += '_'
+                print("Incorrect letters:", incorrect)
+                guessesLeft -= 1
+                if guessesLeft > 0:
+                    print("Guesses left:", guessesLeft)
+                elif guessesLeft == 0:
+                    print("Out of guesses. The correct word was:", randword)
+                    game = False
+                    
+    print("Your score:", len(correct_guesses))
