@@ -1,0 +1,17 @@
+words_3_letters = ['cat', 'dog', 'bat', 'cup', 'key', 'map', 'pen', 'pig', 'box', 'bug']
+words_4_letters = ['fish', 'jump', 'lamp', 'moon', 'rain', 'star', 'time', 'wind', 'bird', 'frog']
+words_5_letters = ['apple', 'beach', 'clock', 'drift', 'fairy', 'glass', 'horse', 'knife', 'plant', 'smile']
+words_6_letters = ['banana', 'castle', 'dancer', 'garden', 'jacket', 'monkey', 'pickle', 'rocket', 'turtle']
+words_7_letters = ['diamond', 'holiday', 'monster', 'rainbow', 'sunrise', 'unicorn', 'victory']
+
+def select_random_word(word_length):
+    if word_length == 3:
+        return random.choice(words_3_letters)
+    elif word_length == 4:
+        return random.choice(words_4_letters)
+    elif word_length == 5:
+        return random.choice(words_5_letters)
+    elif word_length == 6:
+        return random.choice(words_6_letters)
+    elif word_length == 7:
+        return random.choice(words_7_letters)
