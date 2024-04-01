@@ -1,0 +1,18 @@
+
+def generate_boost():
+    return random.choice(["reveal_letter", "mulligan"])
+
+def apply_boost(boost_type, randword):
+    if boost_type == "reveal_letter":
+        reveal_index = random.randint(0, len(randword) - 1)
+        revealed_word = list(randword)  # Convert randword to list for modification
+        correct_letter = randword[reveal_index]
+        revealed_word[reveal_index] = correct_letter
+        return reveal_index
+    elif boost_type == "mulligan":
+        return None  # Mulligan boost doesn't modify the word
+
+def mulligan(randword, word_length):
+    new_word = select_random_word(word_length)
+    print("Mulligan used. New word selected.")
+    return new_word
