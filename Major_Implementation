@@ -1,29 +1,60 @@
+import random
+
+# Lists of words of different lengths
+words_3_letters = ['cat', 'dog', 'bat', 'cup', 'key', 'map', 'pen', 'pig', 'box', 'bug']
+words_4_letters = ['fish', 'jump', 'lamp', 'moon', 'rain', 'star', 'time', 'wind', 'bird', 'frog']
+words_5_letters = ['apple', 'beach', 'clock', 'drift', 'fairy', 'glass', 'horse', 'knife', 'plant', 'smile']
+words_6_letters = ['castle', 'dancer', 'garden', 'jacket', 'monkey', 'pickle', 'rocket', 'turtle']
+words_7_letters = ['diamond', 'holiday', 'monster', 'rainbow', 'sunrise', 'unicorn', 'victory']
+
+def select_random_word(word_length):
+    if word_length == 3:
+        return random.choice(words_3_letters)
+    elif word_length == 4:
+        return random.choice(words_4_letters)
+    elif word_length == 5:
+        return random.choice(words_5_letters)
+    elif word_length == 6:
+        return random.choice(words_6_letters)
+    elif word_length == 7:
+        return random.choice(words_7_letters)
+
+def generate_boost():
+    return random.choice(["reveal_letter", "mulligan"])
+
+def apply_boost(boost_type, randword):
+    if boost_type == "reveal_letter":
+        reveal_index = random.randint(0, len(randword) - 1)
+        revealed_word = list(randword)
+        revealed_word[reveal_index] = randword[reveal_index]
+        print(f"Revealed letter at index {reveal_index + 1}: {randword[reveal_index]}")
+        return "".join(revealed_word)
+    elif boost_type == "mulligan":
+        new_word = select_random_word(len(randword))
+        print("Mulligan used. New word selected.")
+        return new_word
+
 def play_game():
     max_word_length = 7
     word_length = 3
     correct_guesses = []
     guessesLeft = 5
-    letter_boost_available = False
+    available_boost = None
     mulligan_available = False
     game = True
     while game:
         randword = select_random_word(word_length)
-        boost_type = generate_boost()  # Generate boost type for each word
         print("Guess the", word_length, "letter word.")
         for _ in range(guessesLeft):
-            guess = input("Enter your guess or activate your boost/mulligan! (type '1' for letter boost, '2' for mulligan) ")
-            if guess == "1":
-                if letter_boost_available:
-                    reveal_index = apply_boost(boost_type, randword)
-                    if reveal_index is not None:
-                        print("Revealed letter at index", reveal_index + 1, ":", randword[reveal_index])
-                        letter_boost_available = False
-                        guessesLeft += 1
-            elif guess == "2":
-                if mulligan_available:
-                    randword = mulligan(randword, word_length)
-                    guessesLeft = 4  # Reset guesses after mulligan
-                    mulligan_available = False
+            guess = input("Enter your guess or activate your boost/mulligan! (type '1' for boost, '2' for mulligan) ")
+            if guess == "1" and available_boost is not None:
+                randword = apply_boost(available_boost, randword)
+                available_boost = None
+                guessesLeft += 1
+            elif guess == "2" and mulligan_available:
+                randword = apply_boost("mulligan", randword)
+                mulligan_available = False
+                guessesLeft = 4  # Reset guesses after mulligan
             elif guess == randword:
                 if word_length == max_word_length:
                     print("Congratulations! You guessed a", max_word_length, "letter word! Well done!")
@@ -33,29 +64,29 @@ def play_game():
                         return
                     else:
                         word_length = 3  # Reset to 3-letter words
-                        letter_boost_available = True  # Allow letter boost for the new word length
-                        mulligan_available = True  # Allow mulligan for the new word length
+                        available_boost = None  # Reset available boost
+                        mulligan_available = False  # Reset mulligan availability
                         break
                 else:
                     print("Congratulations! You guessed the word correctly (and gained a boost!). The word was:", randword)
                     correct_guesses.append(randword)
-                    if generate_boost() == "reveal_letter":
+                    available_boost = generate_boost()
+                    if available_boost == "reveal_letter":
                         print("You got a letter boost!")
-                        letter_boost_available = True 
-                    elif generate_boost() == "mulligan":
+                    elif available_boost == "mulligan":
                         print("You got a mulligan boost!")
-                        mulligan_available = True 
+                        mulligan_available = True
                     guessesLeft = 4  # Refresh guesses for the next word
                     word_length += 1  # Move to the next word length
-                    if word_length == 7:
+                    if word_length == 8:
                         word_length = 3
                     break
             else:
                 print("Incorrect guess. Try again.")
                 incorrect = ''
-                for letter in guess:
+                for i, letter in enumerate(guess):
                     if letter in randword:
-                        if letter == randword[guess.index(letter)]:
+                        if letter == randword[i]:
                             incorrect += letter
                         else:
                             incorrect += '~'
@@ -70,3 +101,6 @@ def play_game():
                     game = False
                     
     print("Your score:", len(correct_guesses))
+
+if __name__ == "__main__":
+    play_game()
